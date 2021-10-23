@@ -1,0 +1,19 @@
+# 设置端⼝为8080
+server:
+  port: 8080
+
+spring:
+  thymeleaf:
+    cache: false
+  data:
+    mongodb:
+      authentication-database: auth_test
+      database: auth_test
+      username: testUser
+      password: "123456"
+      host: 127.0.0.1
+      port: 27017
+  redis:
+    database: 0
+    host: 127.0.0.1
+    timeout: 3000       # 连接超时时间 单位 ms（毫秒）
