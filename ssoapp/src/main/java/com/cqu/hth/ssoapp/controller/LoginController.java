@@ -37,16 +37,28 @@ import org.apache.tomcat.jni.Time;
 @RequestMapping("/")
 public class LoginController {
 
-    public String qSys;
     @GetMapping("/ssoServerLogin")
-    public String login(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        qSys = "/"+request.getParameter("service");
+    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        /**
+         * @description: 若已登录，带token重定向请求相应子系统，否则返回sso登录界面
+         * @param {*}
+         * @return {*}
+         */        
+        String qSys = "/ssoCenter"; //默认进入sso认证中心
+        String targetService = request.getParameter("service");
+        if (targetService!=null)
+            qSys = "/" + targetService;
+
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("token"))
+            if(cookie.getName().equals("token")) //带有token说明之前登录过，不需要再次登录拿到token
                 response.sendRedirect(qSys+"?token="+cookie.getValue());
         }
-        return "login";
+
+        ModelAndView mView = new ModelAndView("login");
+        mView.getModel().put("service", qSys);
+        
+        return mView;
     }
 
     @PostMapping("/ssoServerLogin")
@@ -55,6 +67,9 @@ public class LoginController {
         String userName = user.getUserName();
         String password = user.getPwd();
         System.out.println(userName + ":" + password);
+        String qSys = user.getService();
+
+
         String token = UUID.randomUUID().toString();
         HttpSession session = request.getSession();
         session.setAttribute("token", token);
@@ -62,6 +77,7 @@ public class LoginController {
         Cookie newCookie = new Cookie("token", token);
         response.addCookie(newCookie); //加token添加进cookie，保存在浏览器
         response.sendRedirect(qSys + "?token=" + token);
+
     }
 
     @GetMapping(value = "/checkToken")
@@ -70,8 +86,7 @@ public class LoginController {
         String token = request.getParameter("token");
         String qPath = "/" + request.getParameter("service");
         System.out.println(token);
-        if (request.getSession().getAttribute("token") != null)
-        {
+        if (request.getSession().getAttribute("token") != null) {
             String trueToken = (String) request.getSession().getAttribute("token");
             if (token.equals(trueToken)) {
                 request.getSession().setAttribute("islogin", true);
@@ -82,6 +97,12 @@ public class LoginController {
         }
         request.getRequestDispatcher(qPath).forward(request, response);
         return;
+    }
+    
+    @GetMapping(value = "/ssoCenter")
+    public String ssoCenter()
+    {
+        return "sys1";
     }
 
     

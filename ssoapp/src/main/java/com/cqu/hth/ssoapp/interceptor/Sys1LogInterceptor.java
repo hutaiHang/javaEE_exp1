@@ -19,7 +19,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class LogInterceptor implements HandlerInterceptor {
+public class Sys1LogInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,HttpServletResponse response, Object handler) throws IOException,ServletException
     {
@@ -29,7 +29,7 @@ public class LogInterceptor implements HandlerInterceptor {
 
         String ssoCenterUrl = "/ssoServerLogin";
         //跳转到sso认证中心
-        if(request.getParameter("token")==null)
+        if(request.getParameter("token")==null) //没有token，需要登录
         {
             response.sendRedirect(ssoCenterUrl+"?service=sys1");
             return false;

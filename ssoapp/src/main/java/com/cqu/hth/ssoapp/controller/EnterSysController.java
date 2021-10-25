@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-public class SessionController {
+public class EnterSysController {
     @RequestMapping(value = "/sys1")
     public String sys1(HttpServletRequest request, HttpServletResponse response) throws IOException
     {

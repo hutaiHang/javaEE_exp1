@@ -6,7 +6,8 @@
  */
 package com.cqu.hth.ssoapp.config;
 
-import com.cqu.hth.ssoapp.interceptor.LogInterceptor;
+import com.cqu.hth.ssoapp.interceptor.SsoLogInterceptor;
+import com.cqu.hth.ssoapp.interceptor.Sys1LogInterceptor;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -18,6 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry)
     {
-        registry.addInterceptor(new LogInterceptor()).addPathPatterns("/sys1");
+        registry.addInterceptor(new Sys1LogInterceptor()).addPathPatterns("/sys1");
+        registry.addInterceptor(new SsoLogInterceptor()).addPathPatterns("/ssoCenter");
     }
 }

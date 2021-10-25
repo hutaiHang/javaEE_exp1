@@ -12,7 +12,7 @@ import lombok.Data;
 public class User {
     private String userName;
     private String pwd;
-
+    private String service;
     public String getUserName()
     {
         return this.userName;
@@ -31,6 +31,16 @@ public class User {
     public void setPwd(String newPwd)
     {
         this.pwd = newPwd;
+    }
+
+    public String getService()
+    {
+        return this.service;
+    }
+
+    public void setService(String service)
+    {
+        this.service = service;
     }
 
 }
