@@ -19,10 +19,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class Sys1LogInterceptor implements HandlerInterceptor {
+public class LogInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,HttpServletResponse response, Object handler) throws IOException,ServletException
     {
+        String targetService = request.getRequestURI().substring(1); 
         Object isLogin = request.getSession().getAttribute("islogin");
         if(isLogin!=null && isLogin.equals((Object)true)) //若已登录该子系统，直接访问资源
             return true;
@@ -31,7 +32,7 @@ public class Sys1LogInterceptor implements HandlerInterceptor {
         //跳转到sso认证中心
         if(request.getParameter("token")==null) //没有token，需要登录
         {
-            response.sendRedirect(ssoCenterUrl+"?service=sys1");
+            response.sendRedirect(ssoCenterUrl+"?service="+targetService);
             return false;
         }
         
@@ -39,7 +40,7 @@ public class Sys1LogInterceptor implements HandlerInterceptor {
         System.out.println(token);
 
         //检查token是否有效
-        request.getRequestDispatcher("/checkToken?token="+token+"&service=sys1").forward(request, response);
+        request.getRequestDispatcher("/checkToken?token="+token+"&service="+targetService).forward(request, response);
         return false;
     }
 }

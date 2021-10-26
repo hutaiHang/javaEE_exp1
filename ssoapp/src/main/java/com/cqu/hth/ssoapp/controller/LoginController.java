@@ -72,7 +72,7 @@ public class LoginController {
 
         String token = UUID.randomUUID().toString();
         HttpSession session = request.getSession();
-        session.setAttribute("token", token);
+        session.setAttribute("token", token); //建立全局会话
         
         Cookie newCookie = new Cookie("token", token);
         response.addCookie(newCookie); //加token添加进cookie，保存在浏览器
@@ -86,24 +86,17 @@ public class LoginController {
         String token = request.getParameter("token");
         String qPath = "/" + request.getParameter("service");
         System.out.println(token);
-        if (request.getSession().getAttribute("token") != null) {
-            String trueToken = (String) request.getSession().getAttribute("token");
+        if (request.getSession().getAttribute("token") != null) { //若全局会话未过期
+            String trueToken = (String) request.getSession().getAttribute("token");//真正存放在session里的token
             if (token.equals(trueToken)) {
-                request.getSession().setAttribute("islogin", true);
+                request.getSession().setAttribute("islogin", true);//建立局部会话
                 System.out.println("okkk");
                 request.getRequestDispatcher(qPath).forward(request, response);
                 return;
             }
         }
-        request.getRequestDispatcher(qPath).forward(request, response);
+        request.getRequestDispatcher(qPath).forward(request, response);//token过期则重新登录
         return;
     }
-    
-    @GetMapping(value = "/ssoCenter")
-    public String ssoCenter()
-    {
-        return "sys1";
-    }
-
-    
+        
 }
