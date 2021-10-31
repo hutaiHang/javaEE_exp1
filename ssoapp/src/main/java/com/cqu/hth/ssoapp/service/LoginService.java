@@ -7,14 +7,30 @@
 package com.cqu.hth.ssoapp.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
 
+import com.cqu.hth.ssoapp.domain.User;
+import com.cqu.hth.ssoapp.repository.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
 public class LoginService {
     @Autowired
-    IRedisService iRedisService;
-
-    public boolean checkInfo(String userName,String pwd)
+    UserRepository userRepository;
+    public boolean checkAcc(String userEmail,String pwd)
     {
-        return pwd == iRedisService.get(userName).toString();
+        Optional<User> users = userRepository.findById(userEmail);
+        if (!users.isPresent())
+            return false;
+        String password = users.get().getPwd();
+        return password.equals(pwd);
+    }
+    
+    public boolean singNewUser(User user)
+    {
+        userRepository.insert(user);
+        return true;
     }
 }

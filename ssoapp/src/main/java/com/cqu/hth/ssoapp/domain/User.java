@@ -6,21 +6,23 @@
  */
 package com.cqu.hth.ssoapp.domain;
 
+import org.springframework.data.annotation.Id;
+
 import lombok.Data;
 
 @Data
 public class User {
-    private String userName;
+    @Id
+    private String email;
     private String pwd;
-    private String service;
-    public String getUserName()
+    public String getEmail()
     {
-        return this.userName;
+        return this.email;
     }
 
-    public void setUserName(String newName)
+    public void setEmail(String newEmail)
     {
-        this.userName=newName;
+        this.email = newEmail;
     }
 
     public String getPwd()
@@ -31,16 +33,6 @@ public class User {
     public void setPwd(String newPwd)
     {
         this.pwd = newPwd;
-    }
-
-    public String getService()
-    {
-        return this.service;
-    }
-
-    public void setService(String service)
-    {
-        this.service = service;
     }
 
 }

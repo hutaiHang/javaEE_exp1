@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -21,21 +22,29 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import com.cqu.hth.ssoapp.domain.User;
+import com.cqu.hth.ssoapp.service.LoginService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.tags.ParamAware;
+
+import ch.qos.logback.core.subst.Token;
+
 import org.apache.tomcat.jni.Time;
 
 @Controller
 @RequestMapping("/")
 public class LoginController {
+    @Autowired
+    LoginService loginService;
 
     @GetMapping("/ssoServerLogin")
     public ModelAndView login(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -50,10 +59,24 @@ public class LoginController {
             qSys = "/" + targetService;
 
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("token")) //带有token说明之前登录过，不需要再次登录拿到token
-                response.sendRedirect(qSys+"?token="+cookie.getValue());
+        if (cookies != null)
+        {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) //带有token说明之前登录过，不需要再次登录拿到token
+                {
+                    Object trueToken = request.getSession().getAttribute("token");
+                    if(trueToken!=null && cookie.getValue().equals((String)trueToken))
+                        response.sendRedirect(qSys + "?token=" + cookie.getValue()); //若token未过期则直接跳转
+                    else //否则清除token
+                    {
+                        cookie.setMaxAge(0);
+                        response.addCookie(cookie);
+                    }
+                }
+                    
+            }
         }
+
 
         ModelAndView mView = new ModelAndView("login");
         mView.getModel().put("service", qSys);
@@ -61,23 +84,39 @@ public class LoginController {
         return mView;
     }
 
-    @PostMapping("/ssoServerLogin")
-    public void login(@Valid User user, HttpServletRequest request, HttpServletResponse response)
+    @RequestMapping(value="/ssoServerLogin", method=RequestMethod.POST, params="action=Login")
+    public ModelAndView login(@Valid User user, String service,HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        String userName = user.getUserName();
+        String userEmail = user.getEmail();
         String password = user.getPwd();
-        System.out.println(userName + ":" + password);
-        String qSys = user.getService();
-
-
-        String token = UUID.randomUUID().toString();
-        HttpSession session = request.getSession();
-        session.setAttribute("token", token); //建立全局会话
+        boolean rst = loginService.checkAcc(userEmail, password);
+        if(rst)
+        {
+            String qSys = service;
+            System.out.println(qSys);
+            String token = UUID.randomUUID().toString();
+            HttpSession session = request.getSession();
+            session.setAttribute("token", token); //建立全局会话   
+    
+            Cookie newCookie = new Cookie("token", token);
+            response.addCookie(newCookie); //加token添加进cookie，保存在浏览器
+            response.sendRedirect(qSys + "?token=" + token);
+        }
+        ModelAndView mView = new ModelAndView("login");
+        mView.getModel().put("errorpwd", true);
+        mView.getModel().put("service", service);
+        return mView;        
+    }
+    
+    @RequestMapping(value="/ssoServerLogin", method=RequestMethod.POST, params="action=Sign")
+    public ModelAndView sign(@Valid User user, String service,HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
         
-        Cookie newCookie = new Cookie("token", token);
-        response.addCookie(newCookie); //加token添加进cookie，保存在浏览器
-        response.sendRedirect(qSys + "?token=" + token);
-
+        loginService.singNewUser(user);
+        ModelAndView mView = new ModelAndView("login");
+        mView.getModel().put("newUser", true);
+        mView.getModel().put("service", service);
+        return mView; 
     }
 
     @GetMapping(value = "/checkToken")
@@ -90,12 +129,12 @@ public class LoginController {
             String trueToken = (String) request.getSession().getAttribute("token");//真正存放在session里的token
             if (token.equals(trueToken)) {
                 request.getSession().setAttribute("islogin", true);//建立局部会话
-                System.out.println("okkk");
                 request.getRequestDispatcher(qPath).forward(request, response);
                 return;
             }
         }
-        request.getRequestDispatcher(qPath).forward(request, response);//token过期则重新登录
+        response.sendRedirect(qPath);//token过期则重新登录
+        // request.getRequestDispatcher(qPath).forward(request, response);//token过期则重新登录
         return;
     }
         

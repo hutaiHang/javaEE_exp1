@@ -1,5 +1,5 @@
 /*
- * @Description: 子系统1拦截器
+ * @Description: 登录拦截器
  * @Autor: hutaihang
  * @Date: 2021-10-21 21:41:12
  * @Coding: UTF-8
@@ -23,8 +23,20 @@ public class LogInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,HttpServletResponse response, Object handler) throws IOException,ServletException
     {
+        String isLogout = request.getParameter("logout");
+        if(isLogout!=null&&isLogout.equals("true"))
+        {
+            Object tmp = request.getSession().getAttribute("islogin");
+            if (tmp != null && tmp.equals((Object) true))
+                System.out.println("ggo");
+            request.getSession().invalidate(); //登出请求，销毁局部会话
+            return false;
+        }
+        
         String targetService = request.getRequestURI().substring(1); 
         Object isLogin = request.getSession().getAttribute("islogin");
+        if(isLogin!=null)
+            System.out.println((boolean) isLogin);
         if(isLogin!=null && isLogin.equals((Object)true)) //若已登录该子系统，直接访问资源
             return true;
 
@@ -38,9 +50,10 @@ public class LogInterceptor implements HandlerInterceptor {
         
         String token = request.getParameter("token");
         System.out.println(token);
+        String sessionId = null;
 
         //检查token是否有效
-        request.getRequestDispatcher("/checkToken?token="+token+"&service="+targetService).forward(request, response);
+        request.getRequestDispatcher("/checkToken?token="+token+"&service="+targetService+"&SESSION="+sessionId).forward(request, response);
         return false;
     }
 }
