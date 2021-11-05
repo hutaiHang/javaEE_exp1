@@ -95,7 +95,7 @@ public class LoginController {
             HttpSession session = request.getSession();
             session.setAttribute("token", token); // 建立全局会话
 
-            Cookie newCookie = new Cookie("token", token);
+            Cookie newCookie = new Cookie("token", token);//创建cookie
             response.addCookie(newCookie); // 加token添加进cookie，保存在浏览器
             response.sendRedirect(qSys + "?token=" + token);
         }
