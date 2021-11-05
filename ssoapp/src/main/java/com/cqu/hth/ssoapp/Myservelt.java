@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
 @WebServlet(urlPatterns = "/test")
 public class Myservelt extends HttpServlet {
     @Override
@@ -34,7 +33,8 @@ public class Myservelt extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServerException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServerException, IOException {
         doGet(request, response);
     }
 }

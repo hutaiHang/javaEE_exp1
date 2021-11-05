@@ -15,23 +15,20 @@ public class User {
     @Id
     private String email;
     private String pwd;
-    public String getEmail()
-    {
+
+    public String getEmail() {
         return this.email;
     }
 
-    public void setEmail(String newEmail)
-    {
+    public void setEmail(String newEmail) {
         this.email = newEmail;
     }
 
-    public String getPwd()
-    {
+    public String getPwd() {
         return this.pwd;
     }
 
-    public void setPwd(String newPwd)
-    {
+    public void setPwd(String newPwd) {
         this.pwd = newPwd;
     }
 

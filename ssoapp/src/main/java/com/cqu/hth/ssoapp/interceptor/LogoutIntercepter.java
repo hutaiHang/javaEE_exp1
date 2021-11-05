@@ -22,10 +22,10 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class LogoutIntercepter implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request,HttpServletResponse response, Object handler) throws IOException,ServletException
-    { 
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws IOException, ServletException {
         Object isLogin = request.getSession().getAttribute("islogin");
-        if(isLogin==null || isLogin.equals((Object)false)) //若已经退出，引导至登录界面
+        if (isLogin == null || isLogin.equals((Object) false)) // 若已经退出，引导至登录界面
         {
             response.sendRedirect("/ssoServerLogin");
             return false;

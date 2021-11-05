@@ -23,14 +23,16 @@ public class IRedisService {
     @Autowired
     protected StringRedisTemplate redisTemplate;
 
-    private  final Logger log = LoggerFactory.getLogger(IRedisService.class);
+    private final Logger log = LoggerFactory.getLogger(IRedisService.class);
+
     /**
      * 写入redis缓存（不设置expire存活时间）
+     * 
      * @param key
      * @param value
      * @return
      */
-    public boolean set(final String key, String value){
+    public boolean set(final String key, String value) {
         boolean result = false;
         try {
             ValueOperations operations = redisTemplate.opsForValue();
@@ -44,12 +46,13 @@ public class IRedisService {
 
     /**
      * 写入redis缓存（设置expire存活时间）
+     * 
      * @param key
      * @param value
      * @param expire
      * @return
      */
-    public boolean set(final String key, String value, Long expire){
+    public boolean set(final String key, String value, Long expire) {
         boolean result = false;
         try {
             ValueOperations operations = redisTemplate.opsForValue();
@@ -62,13 +65,13 @@ public class IRedisService {
         return result;
     }
 
-
     /**
      * 读取redis缓存
+     * 
      * @param key
      * @return
      */
-    public Object get(final String key){
+    public Object get(final String key) {
         Object result = null;
         try {
             ValueOperations operations = redisTemplate.opsForValue();
@@ -81,10 +84,11 @@ public class IRedisService {
 
     /**
      * 判断redis缓存中是否有对应的key
+     * 
      * @param key
      * @return
      */
-    public boolean exists(final String key){
+    public boolean exists(final String key) {
         boolean result = false;
         try {
             result = redisTemplate.hasKey(key);
@@ -96,13 +100,14 @@ public class IRedisService {
 
     /**
      * redis根据key删除对应的value
+     * 
      * @param key
      * @return
      */
-    public boolean remove(final String key){
+    public boolean remove(final String key) {
         boolean result = false;
         try {
-            if(exists(key)){
+            if (exists(key)) {
                 redisTemplate.delete(key);
             }
             result = true;
@@ -114,13 +119,13 @@ public class IRedisService {
 
     /**
      * redis根据keys批量删除对应的value
+     * 
      * @param keys
      * @return
      */
-    public void remove(final String... keys){
-        for(String key : keys){
+    public void remove(final String... keys) {
+        for (String key : keys) {
             remove(key);
         }
     }
 }
-

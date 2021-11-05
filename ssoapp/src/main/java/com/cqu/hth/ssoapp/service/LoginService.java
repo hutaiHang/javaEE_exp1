@@ -6,7 +6,6 @@
  */
 package com.cqu.hth.ssoapp.service;
 
-
 import java.util.Optional;
 
 import com.cqu.hth.ssoapp.domain.User;
@@ -19,17 +18,16 @@ import org.springframework.stereotype.Service;
 public class LoginService {
     @Autowired
     UserRepository userRepository;
-    public boolean checkAcc(String userEmail,String pwd)
-    {
+
+    public boolean checkAcc(String userEmail, String pwd) {
         Optional<User> users = userRepository.findById(userEmail);
         if (!users.isPresent())
             return false;
         String password = users.get().getPwd();
         return password.equals(pwd);
     }
-    
-    public boolean singNewUser(User user)
-    {
+
+    public boolean singNewUser(User user) {
         userRepository.insert(user);
         return true;
     }
